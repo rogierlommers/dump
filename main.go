@@ -1,7 +1,31 @@
 package main
 
-import "github.com/sirupsen/logrus"
+import (
+	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/rogierlommers/dumper/static"
+	"github.com/sirupsen/logrus"
+)
+
+const (
+	host = "0.0.0.0"
+	port = 8080
+)
 
 func main() {
-	logrus.Info("start")
+	router := mux.NewRouter()
+	router.HandleFunc("/", static.IndexHandler)
+
+	logrus.Infof("deamon running on host %s and port %d", host, port)
+
+	srv := &http.Server{
+		Handler: router,
+		Addr:    "0.0.0.0:8080",
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		logrus.Fatal(err)
+	}
+
 }
