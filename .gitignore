@@ -3,7 +3,7 @@
 *.dll
 *.so
 *.dylib
-bin/dumper-linux-amd64
+bin/dump-linux-amd64
 
 # Test binary, build with `go test -c`
 *.test
