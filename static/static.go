@@ -7,9 +7,7 @@ import (
 )
 
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-
 	if _, err := w.Write([]byte("running...")); err != nil {
 		logrus.Error(err)
 	}
-
 }

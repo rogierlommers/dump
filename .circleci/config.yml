@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.9
-    working_directory: /go/src/github.com/rogierlommers/dumper
+    working_directory: /go/src/github.com/rogierlommers/dump
     steps:
       - checkout
 

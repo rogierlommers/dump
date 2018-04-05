@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/rogierlommers/dumper/static"
+	"github.com/rogierlommers/dump/static"
 	"github.com/sirupsen/logrus"
 )
 
