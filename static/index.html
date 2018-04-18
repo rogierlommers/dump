@@ -8,10 +8,14 @@
   <!-- Fine Uploader New/Modern CSS file
     ====================================================================== -->
   <link href="client/fine-uploader-new.css" rel="stylesheet">
+  <link href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
 
-  <!-- Fine Uploader JS file
+  <!-- Fine Uploader JS file and datatables
     ====================================================================== -->
   <script src="client/fine-uploader.js"></script>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
 
   <!-- Fine Uploader Thumbnails template w/ customization
     ====================================================================== -->
@@ -79,7 +83,35 @@
   <!-- Fine Uploader DOM Element
     ====================================================================== -->
   <div id="fine-uploader-validation"></div>
+  <div>
 
+    <script>
+      $(document).ready(function () {
+        $('#myTable').DataTable();
+      });
+    </script>
+    <table id="myTable" class="display">
+      <thead>
+        <tr>
+          <th>Download link</th>
+          <th>Filename</th>
+          <th>Upload timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Row 1 Data 1</td>
+          <td>Row 1 Data 2</td>
+          <td>blaat</td>
+        </tr>
+        <tr>
+          <td>Row 2 Data 1</td>
+          <td>Row 2 Data 2</td>
+          <td>bliit</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <!-- Your code to create an instance of Fine Uploader and bind to the DOM/template
     ====================================================================== -->
   <script>

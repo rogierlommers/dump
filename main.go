@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -44,9 +43,10 @@ type UploadResponse struct {
 
 func main() {
 	router := mux.NewRouter()
-	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	router.PathPrefix("/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	router.HandleFunc("/upload", UploadHandler)
 	router.HandleFunc("/chunksdone", ChunksDoneHandler)
+	router.HandleFunc("/download/{uid}", DownloadHandler)
 	router.Handle("/upload/", http.StripPrefix("/upload/", http.HandlerFunc(UploadHandler)))
 
 	logrus.Infof("deamon running on host %s and port %d", host, port)
@@ -61,8 +61,12 @@ func main() {
 
 }
 
+func DownloadHandler(w http.ResponseWriter, req *http.Request) {
+	logrus.Info("download")
+}
+
 func UploadHandler(w http.ResponseWriter, req *http.Request) {
-	logrus.Infof("incoming upload....")
+
 	switch req.Method {
 	case http.MethodPost:
 		upload(w, req)
@@ -72,18 +76,17 @@ func UploadHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	errorMsg := fmt.Sprintf("Method [%s] is not supported:", req.Method)
-	logrus.Error(errorMsg)
 	http.Error(w, errorMsg, http.StatusMethodNotAllowed)
 }
 
 func upload(w http.ResponseWriter, req *http.Request) {
 	uuid := req.FormValue(paramUuid)
 	if len(uuid) == 0 {
-		log.Printf("No uuid received, invalid upload request")
+		logrus.Error("No uuid received, invalid upload request")
 		http.Error(w, "No uuid received", http.StatusBadRequest)
 		return
 	}
-	log.Printf("Starting upload handling of request with uuid of [%s]\n", uuid)
+	logrus.Infof("Starting upload handling of request with uuid of [%s]\n", uuid)
 	file, headers, err := req.FormFile(paramFile)
 	if err != nil {
 		writeUploadResponse(w, err)
@@ -121,7 +124,7 @@ func upload(w http.ResponseWriter, req *http.Request) {
 }
 
 func delete(w http.ResponseWriter, req *http.Request) {
-	log.Printf("Delete request received for uuid [%s]", req.URL.Path)
+	logrus.Infof("Delete request received for uuid [%s]", req.URL.Path)
 	err := os.RemoveAll(uploadDir + "/" + req.URL.Path)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -175,7 +178,7 @@ func ChunksDoneHandler(w http.ResponseWriter, req *http.Request) {
 		totalWritten += written
 
 		if err := os.Remove(part); err != nil {
-			log.Printf("Error: %v", err)
+			logrus.Errorf("Error: %v", err)
 		}
 	}
 
@@ -188,7 +191,7 @@ func ChunksDoneHandler(w http.ResponseWriter, req *http.Request) {
 func writeHttpResponse(w http.ResponseWriter, httpCode int, err error) {
 	w.WriteHeader(httpCode)
 	if err != nil {
-		log.Printf("An error happened: %v", err)
+		logrus.Errorf("An error happened: %v", err)
 		w.Write([]byte(err.Error()))
 	}
 }
