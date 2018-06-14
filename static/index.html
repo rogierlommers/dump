@@ -8,7 +8,6 @@
   <!-- Fine Uploader New/Modern CSS file
     ====================================================================== -->
   <link href="client/fine-uploader-new.css" rel="stylesheet">
-  <link href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
 
   <!-- Fine Uploader JS file and datatables
     ====================================================================== -->
@@ -16,6 +15,9 @@
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 
+
+  <!-- history shizzle-->
+  <script type="application/javascript" src="/history/history.js"></script>
 
   <!-- Fine Uploader Thumbnails template w/ customization
     ====================================================================== -->
@@ -79,38 +81,24 @@
   <title>Fine Uploader Validation Demo</title>
 </head>
 
-<body>
+<body onload="fetch()">
   <!-- Fine Uploader DOM Element
     ====================================================================== -->
   <div id="fine-uploader-validation"></div>
   <div>
 
-    <script>
-      $(document).ready(function () {
-        $('#myTable').DataTable();
-      });
-    </script>
-    <table id="myTable" class="display">
-      <thead>
+    <div id="historyContainer">
+      <table width="100%" border="1" id="historyTable">
         <tr>
-          <th>Download link</th>
-          <th>Filename</th>
-          <th>Upload timestamp</th>
+          <td>UID</td>
+          <td>NAME</td>
+          <td>FORCE-DOWNLOAD</td>
+          <td>SIZE</td>
         </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Row 1 Data 1</td>
-          <td>Row 1 Data 2</td>
-          <td>blaat</td>
-        </tr>
-        <tr>
-          <td>Row 2 Data 1</td>
-          <td>Row 2 Data 2</td>
-          <td>bliit</td>
-        </tr>
-      </tbody>
-    </table>
+      </table>
+    </div>
+
+
   </div>
   <!-- Your code to create an instance of Fine Uploader and bind to the DOM/template
     ====================================================================== -->
@@ -123,8 +111,8 @@
       },
       thumbnails: {
         placeholders: {
-          waitingPath: '/static/client/placeholders/waiting-generic.png',
-          notAvailablePath: '/static/client/placeholders/not_available-generic.png'
+          waitingPath: 'client/placeholders/waiting-generic.png',
+          notAvailablePath: 'client/placeholders/not_available-generic.png'
         }
       },
       validation: {
