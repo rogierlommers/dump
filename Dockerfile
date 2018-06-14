@@ -7,8 +7,8 @@ RUN apt-get update
 RUN apt-get install -y ca-certificates curl
 
 # add binary
-COPY bin/dump-linux-amd64 /dump-linux-amd64
-COPY /static /static
+COPY --chown=1000:1000 bin/dump-linux-amd64 /dump-linux-amd64
+COPY --chown=1000:1000 /static /static
 
 # change to data dir and run bianry
 WORKDIR "/"
