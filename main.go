@@ -55,7 +55,7 @@ func main() {
 	router.HandleFunc("/download/{uid}", DownloadHandler)
 	router.HandleFunc("/rss", RSSHandler)
 	router.Handle("/upload/", http.StripPrefix("/upload/", http.HandlerFunc(UploadHandler)))
-	router.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
+	router.PathPrefix("/").Handler(http.StripPrefix("/landing-page", http.FileServer(http.Dir("static"))))
 
 	srv := &http.Server{
 		Handler: router,
