@@ -32,6 +32,7 @@ func upload(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "No uuid received", http.StatusBadRequest)
 		return
 	}
+
 	logrus.Infof("Starting upload handling of request with uuid of [%s]\n", uuid)
 	file, headers, err := req.FormFile(paramFile)
 	if err != nil {
