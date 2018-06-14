@@ -21,7 +21,7 @@ var fetch = function (event) {
         var size = row.insertCell(3);
 
         uid.innerHTML = element.uid;
-        link.innerHTML = '<a href="/download/' + element.uid + '">' + element.name + '</a>';
+        link.innerHTML = '<a href="/download/' + element.uid + '?download=false">' + element.name + '</a>';
         download.innerHTML = '<a href="/download/' + element.uid + '?download=true">#</a>';
         size.innerHTML = humanFileSize(element.size, true);
 

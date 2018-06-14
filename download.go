@@ -65,8 +65,9 @@ func DownloadHandler(w http.ResponseWriter, req *http.Request) {
 	// detect content type
 	detectedContentType := http.DetectContentType(data)
 	parts := strings.Split(detectedContentType, "/")
+	logrus.Debugf("detected mimetype: %q", parts[0])
 
-	if parts[0] != "image" {
+	if parts[0] != "image" && parts[0] != "video" {
 		w.Header().Set("Content-Disposition", "attachment; filename="+filenameToDownload+"")
 	} else {
 		if download {
