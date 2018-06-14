@@ -87,17 +87,22 @@ func ListFilesHandler(w http.ResponseWriter, req *http.Request) {
 
 	err := filepath.Walk(uploadDir, func(listedPath string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
-			parts := strings.Split(listedPath, "/")
-			if len(parts) != 3 {
-				logrus.Errorf("[list] strange amount of parts detected, skipping file %q", listedPath)
+
+			parts := strings.Split(filepath.Dir(listedPath), "/")
+			extractedUID := parts[len(parts)-1]
+
+			if len(extractedUID) < 10 {
+				logrus.Errorf("strange uid detected, skipping file %q", listedPath)
 				return nil
 			}
+
 			newFile := uploadedFile{
-				UID:  parts[1],
+				UID:  extractedUID,
 				Name: info.Name(),
 				Size: info.Size(),
 			}
-			logrus.Debugf("[list] adding file: %+v", newFile)
+
+			logrus.Debugf("adding file: %+v", newFile)
 			listOfFiles = append(listOfFiles, newFile)
 		}
 		return nil

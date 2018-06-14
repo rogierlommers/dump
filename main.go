@@ -1,18 +1,16 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	host = "0.0.0.0"
-	port = 8080
-)
-
-var uploadDir = "uploads"
+var uploadDir string
 
 // Request parameters
 const (
@@ -37,7 +35,18 @@ type UploadResponse struct {
 }
 
 func main() {
-	logrus.SetLevel(logrus.DebugLevel)
+	debug := flag.Bool("debug", false, "set to true if you want debug info")
+	flag.Parse()
+
+	if *debug {
+		logrus.SetLevel(logrus.DebugLevel)
+	}
+
+	uploadDir = os.Getenv("UPLOADDIR")
+
+	if err := checkDatadir(uploadDir); err != nil {
+		logrus.Fatalf("invalid data directory: %v", err)
+	}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/upload", UploadHandler)
@@ -48,14 +57,28 @@ func main() {
 	router.Handle("/upload/", http.StripPrefix("/upload/", http.HandlerFunc(UploadHandler)))
 	router.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
 
-	logrus.Infof("deamon running on host %s and port %d", host, port)
 	srv := &http.Server{
 		Handler: router,
 		Addr:    "0.0.0.0:8080",
 	}
 
+	logrus.Infof("using data directory: %s", uploadDir)
+	logrus.Info("deamon running on host 0.0.0.0 and port 8080")
+
 	if err := srv.ListenAndServe(); err != nil {
 		logrus.Fatal(err)
 	}
 
+}
+
+func checkDatadir(path string) error {
+	if len(path) == 0 {
+		return fmt.Errorf("no env var UPLOADDIR defined")
+	}
+
+	if _, err := os.Stat(path); err != nil {
+		return err
+	}
+
+	return nil
 }
