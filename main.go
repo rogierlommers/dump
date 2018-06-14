@@ -1,16 +1,22 @@
 package main
 
 import (
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
-var uploadDir string
+var (
+	uploadDir string
+	username  string
+	password  string
+)
 
 // Request parameters
 const (
@@ -43,19 +49,27 @@ func main() {
 	}
 
 	uploadDir = os.Getenv("UPLOADDIR")
+	username = os.Getenv("USERNAME")
+	password = os.Getenv("PASSWORD")
 
-	if err := checkDatadir(uploadDir); err != nil {
+	if err := checkDatadir(); err != nil {
 		logrus.Fatalf("invalid data directory: %v", err)
+	}
+
+	if err := checkAuth(); err != nil {
+		logrus.Fatalf("invalid credentials: %v", err)
 	}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/upload", UploadHandler)
 	router.HandleFunc("/chunksdone", ChunksDoneHandler)
 	router.HandleFunc("/list", ListFilesHandler)
-	router.HandleFunc("/download/{uid}", DownloadHandler)
 	router.HandleFunc("/rss", RSSHandler)
+	router.HandleFunc("/download/{uid}", DownloadHandler)
 	router.Handle("/upload/", http.StripPrefix("/upload/", http.HandlerFunc(UploadHandler)))
-	router.PathPrefix("/").Handler(http.StripPrefix("/landing-page", http.FileServer(http.Dir("static"))))
+	router.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
+
+	router.Use(basicAuthMiddleware, loggingMiddleware)
 
 	srv := &http.Server{
 		Handler: router,
@@ -71,14 +85,67 @@ func main() {
 
 }
 
-func checkDatadir(path string) error {
-	if len(path) == 0 {
+func checkDatadir() error {
+	if len(uploadDir) == 0 {
 		return fmt.Errorf("no env var UPLOADDIR defined")
 	}
 
-	if _, err := os.Stat(path); err != nil {
+	if _, err := os.Stat(uploadDir); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func checkAuth() error {
+	if len(username) == 0 || len(password) == 0 {
+		return fmt.Errorf("no env var USERNAME or PASSWORD defined")
+	}
+
+	return nil
+}
+
+func basicAuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if !strings.HasPrefix(r.RequestURI, "/download/") {
+
+			logrus.Infof(r.RequestURI)
+			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+
+			s := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
+			if len(s) != 2 {
+				http.Error(w, "Not authorized", 401)
+				return
+			}
+
+			b, err := base64.StdEncoding.DecodeString(s[1])
+			if err != nil {
+				http.Error(w, err.Error(), 401)
+				return
+			}
+
+			pair := strings.SplitN(string(b), ":", 2)
+			if len(pair) != 2 {
+				http.Error(w, "Not authorized", 401)
+				return
+			}
+
+			if pair[0] != username || pair[1] != password {
+				http.Error(w, "Not authorized", 401)
+				return
+			}
+		}
+
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		next.ServeHTTP(w, r)
+	})
+
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logrus.Infof("incoming request: %s", r.RequestURI)
+		next.ServeHTTP(w, r)
+	})
 }
