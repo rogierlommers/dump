@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/rogierlommers/dump/history"
 	"github.com/sirupsen/logrus"
 )
 
@@ -64,7 +65,7 @@ func main() {
 	router.HandleFunc("/upload", UploadHandler)
 	router.HandleFunc("/chunksdone", ChunksDoneHandler)
 	router.HandleFunc("/list", ListFilesHandler)
-	router.HandleFunc("/rss", RSSHandler)
+	router.HandleFunc("/list-history", history.HistoryHandler)
 	router.HandleFunc("/download/{uid}", DownloadHandler)
 	router.Handle("/upload/", http.StripPrefix("/upload/", http.HandlerFunc(UploadHandler)))
 	router.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))

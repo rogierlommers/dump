@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/rogierlommers/dump/history"
 	"github.com/sirupsen/logrus"
 )
 
@@ -77,7 +78,7 @@ func DownloadHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	logrus.Debugf("read %d bytes, filename: %s, content-type: %s", len(data), filenameToDownload, detectedContentType)
-	AddDownload(filenameToDownload, req.Referer(), fmt.Sprintf("%s", filepathToDownload))
+	history.AddElement(filenameToDownload, req.Referer(), fmt.Sprintf("%s", filepathToDownload))
 
 	w.Header().Set("Content-Type", detectedContentType)
 	http.ServeContent(w, req, filenameToDownload, time.Now(), bytes.NewReader(data))
