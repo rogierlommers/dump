@@ -20,7 +20,7 @@ type download struct {
 
 func init() {
 	logrus.Info("setting up cache")
-	history = tinycache.NewCache(10)
+	history = tinycache.NewCache(1000)
 }
 
 func AddElement(filename string, referer string, IP string) {
