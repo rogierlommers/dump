@@ -62,14 +62,19 @@ func main() {
 	}
 
 	router := mux.NewRouter()
+
+	// API routes
 	router.HandleFunc("/upload", UploadHandler)
 	router.HandleFunc("/chunksdone", ChunksDoneHandler)
-	router.HandleFunc("/list", ListFilesHandler)
-	router.HandleFunc("/list-history", history.HistoryHandler)
+	router.HandleFunc("/list-files", ListFilesHandler)
+	router.HandleFunc("/list-download-history", history.HistoryHandler)
 	router.HandleFunc("/download/{uid}", DownloadHandler)
 	router.Handle("/upload/", http.StripPrefix("/upload/", http.HandlerFunc(UploadHandler)))
+
+	// static files handler
 	router.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
 
+	// for each request, use the basic authentication middleware
 	router.Use(basicAuthMiddleware, loggingMiddleware)
 
 	srv := &http.Server{
@@ -146,7 +151,7 @@ func basicAuthMiddleware(next http.Handler) http.Handler {
 
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logrus.Infof("incoming request: %s", r.RequestURI)
+		logrus.Debugf("incoming request: %s", r.RequestURI)
 		next.ServeHTTP(w, r)
 	})
 }

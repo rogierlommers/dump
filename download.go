@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -78,7 +77,7 @@ func DownloadHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	logrus.Debugf("read %d bytes, filename: %s, content-type: %s", len(data), filenameToDownload, detectedContentType)
-	history.AddElement(filenameToDownload, req.Referer(), fmt.Sprintf("%s", filepathToDownload))
+	history.AddElement(filenameToDownload, req.Referer(), req.RemoteAddr)
 
 	w.Header().Set("Content-Type", detectedContentType)
 	http.ServeContent(w, req, filenameToDownload, time.Now(), bytes.NewReader(data))

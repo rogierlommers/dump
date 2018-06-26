@@ -7,17 +7,17 @@
 
   <!-- Fine Uploader New/Modern CSS file
     ====================================================================== -->
-  <link href="client/fine-uploader-new.css" rel="stylesheet">
+  <link href="fine-uploader/fine-uploader-new.css" rel="stylesheet">
 
   <!-- Fine Uploader JS file and datatables
     ====================================================================== -->
-  <script src="client/fine-uploader.js"></script>
+  <script src="fine-uploader/fine-uploader.js"></script>
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 
-
   <!-- history shizzle-->
-  <script type="application/javascript" src="history/history.js"></script>
+  <script type="application/javascript" src="lists.js"></script>
+  <script type="application/javascript" src="moments/moment.min.js"></script>
 
   <!-- Fine Uploader Thumbnails template w/ customization
     ====================================================================== -->
@@ -81,22 +81,34 @@
   <title>Public dumps</title>
 </head>
 
-<body onload="fetch()">
+<body onload="fetchFiles(); fetchHistory()">
   <!-- Fine Uploader DOM Element
     ====================================================================== -->
   <div id="fine-uploader-validation"></div>
-  <div>
+  <br/>
 
-    <div id="historyContainer">
-      <table width="100%" border="1" id="historyTable">
-        <tr>
-          <td>UID</td>
-          <td>NAME</td>
-          <td>FORCE-DOWNLOAD</td>
-          <td>SIZE</td>
-        </tr>
-      </table>
-    </div>
+  <div id="listFilesContainer">
+    <table width="100%" border="1" id="filesTable">
+      <tr>
+        <td>UID</td>
+        <td>NAME</td>
+        <td>FORCE-DOWNLOAD</td>
+        <td>SIZE</td>
+      </tr>
+    </table>
+  </div>
+
+  <br/>
+  <div id="listHistoryContainer">
+    <table width="100%" border="1" id="historyTable">
+      <tr>
+        <td>NAME</td>
+        <td>REFERER</td>
+        <td>REMOTE-ADDRES</td>
+        <td>TIMESTAMP</td>
+      </tr>
+    </table>
+  </div>
 
 
   </div>
@@ -111,8 +123,8 @@
       },
       thumbnails: {
         placeholders: {
-          waitingPath: 'client/placeholders/waiting-generic.png',
-          notAvailablePath: 'client/placeholders/not_available-generic.png'
+          waitingPath: 'fine-uploader/placeholders/waiting-generic.png',
+          notAvailablePath: 'fine-uploader/placeholders/not_available-generic.png'
         }
       },
       validation: {
