@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -40,7 +41,10 @@ func upload(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	fileDir := fmt.Sprintf("%s/%s", uploadDir, uuid)
+	t := time.Now()
+	datePrefix := fmt.Sprintf("%d%02d%02d", t.Year(), t.Month(), t.Day())
+	fileDir := fmt.Sprintf("%s/%s-%s", uploadDir, datePrefix, uuid)
+
 	if err := os.MkdirAll(fileDir, 0777); err != nil {
 		writeUploadResponse(w, err)
 		return
